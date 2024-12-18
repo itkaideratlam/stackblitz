@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ImageUploader } from '../ImageUploader';
-import { DraggableImage } from '../DraggableImage';
+import { ImagePreview } from './ImagePreview';
 import { AnswerList } from './AnswerList';
 import { Button } from '../ui/Button';
 import type { Question } from '../../types/question';
@@ -21,40 +21,16 @@ export function QuestionForm({ onSubmit, initialQuestion }: QuestionFormProps) {
     answers: initialQuestion?.answers || [{ id: '1', text: '', imageUrl: '' }]
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const questionData: Omit<Question, 'id'> = {
-      text: formData.text,
-      subject: formData.subject,
-      class: formData.class,
-      imageUrl: formData.imageUrl || undefined,
-      imagePosition: formData.imagePosition,
-      answers: formData.answers.map(answer => ({
-        ...answer,
-        imagePosition: answer.imagePosition || { x: 0, y: 0, width: 200, height: 200 }
-      }))
-    };
-
-    onSubmit(questionData);
-
-    if (!initialQuestion) {
-      setFormData({
-        text: '',
-        subject: '',
-        class: '',
-        imageUrl: '',
-        imagePosition: { x: 0, y: 0, width: 200, height: 200 },
-        answers: [{ id: '1', text: '', imageUrl: '' }]
-      });
-    }
-  };
-
   const handleImagePositionChange = (position: ImagePosition) => {
     setFormData(prev => ({
       ...prev,
       imagePosition: position
     }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
   };
 
   return (
@@ -77,10 +53,9 @@ export function QuestionForm({ onSubmit, initialQuestion }: QuestionFormProps) {
             onImageUpload={(dataUrl) => setFormData(prev => ({ ...prev, imageUrl: dataUrl }))}
           />
           {formData.imageUrl && (
-            <DraggableImage
-              src={formData.imageUrl}
-              alt="Question"
-              initialPosition={formData.imagePosition}
+            <ImagePreview
+              imageUrl={formData.imageUrl}
+              position={formData.imagePosition}
               onPositionChange={handleImagePositionChange}
             />
           )}

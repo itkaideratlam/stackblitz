@@ -1,11 +1,18 @@
 import React from 'react';
-import { usePaperExport } from '../../hooks/usePaperExport';
+import { usePrintRef } from '../../hooks/usePrintRef';
+import { PrintableContent } from './PrintableContent';
 import { PaperHeader } from './PaperHeader';
-import { PaperContent } from './PaperContent';
+import { exportToWord } from '../../utils/export';
 import type { QuestionPaperProps } from './QuestionPaper.types';
 
 export function QuestionPaper({ paper, onBack }: QuestionPaperProps) {
-  const { contentRef, handlePrint, handleExportWord } = usePaperExport();
+  const { printRef, handlePrint } = usePrintRef();
+
+  const handleExportWord = () => {
+    if (printRef.current) {
+      exportToWord(printRef.current, paper.title);
+    }
+  };
 
   return (
     <div className="bg-white shadow-lg rounded-lg">
@@ -15,9 +22,9 @@ export function QuestionPaper({ paper, onBack }: QuestionPaperProps) {
         onExportWord={handleExportWord}
         onBack={onBack}
       />
-      <PaperContent
+      <PrintableContent
         paper={paper}
-        contentRef={contentRef}
+        printRef={printRef}
       />
     </div>
   );
